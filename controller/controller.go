@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"gin"
+	"log"
 	"net/http"
 	"time"
 
@@ -36,7 +37,26 @@ func Signup() gin.HandlerFunc {
 		}
 
 		count, err := UserCollection.CountDocuments(ctx, bson.M{"email": user.Email})
+		if err != nil {
+			log.Panic(err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error occurred while checking for the email"})
+			return
+		}
+		if count > 0 {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "This email already exists"})
+			return
+		}
 
+		count, err = UserCollection.CountDocuments(ctx, bson.M{"phone": user.Phone})
+		if err != nil {
+			log.Panic(err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error occurred while checking for the phone number"})
+			return
+		}
+		if count > 0 {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "This phone number already exists"})
+			return
+		}
 	}
 }
 
