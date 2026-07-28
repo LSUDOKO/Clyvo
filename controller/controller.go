@@ -9,6 +9,7 @@ import (
 
 	"github.com/LSUDOKO/Clyvo/models"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func HashPassword(password string) string {
@@ -57,6 +58,19 @@ func Signup() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "This phone number already exists"})
 			return
 		}
+
+		password := HashPassword(*user.Password)
+		user.Password = &password
+		user.Created_At = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
+		user.Updated_At = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
+		user.ID = primitive.NewObjectID()
+		user.User_ID = user.id.Hex()
+		token, refreshtoken, _ = generate.TokenGenerator(*user.Email, *user.First_Name, *user.Last_Name, user.User_ID)
+		user.Token
+		user.Refresh_Token
+		user.UserCart
+		user.Address_Details
+		user.Order_Status
 	}
 }
 
